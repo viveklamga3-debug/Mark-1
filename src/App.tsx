@@ -63,7 +63,11 @@ export default function App() {
     const targetLength = lengths.find(l => l.label === length)?.words || 1200;
 
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const apiKey = process.env.GEMINI_API_KEY;
+      if (!apiKey) {
+        throw new Error("Gemini API Key is missing. Please ensure it is set in your environment secrets.");
+      }
+      const ai = new GoogleGenAI({ apiKey });
       
       // 1. Generate Blog Post Text
       const textModel = "gemini-3.1-pro-preview";
