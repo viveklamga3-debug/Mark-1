@@ -43,6 +43,7 @@ export default function App() {
     return saved ? JSON.parse(saved) : [];
   });
   const [showHistory, setShowHistory] = useState(false);
+  const [activePage, setActivePage] = useState<'home' | 'privacy' | 'terms' | 'contact'>('home');
   const resultRef = useRef<HTMLDivElement>(null);
 
   const tones = ['Professional', 'Conversational', 'Technical', 'Humorous', 'Inspirational'];
@@ -266,9 +267,8 @@ export default function App() {
             </div>
             <span className="font-bold text-xl tracking-tight">Architect</span>
           </div>
-          <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-black/60">
-            <a href="#" className="hover:text-black transition-colors">Templates</a>
-            <a href="#" className="hover:text-black transition-colors">SEO Guide</a>
+          <nav className="flex items-center gap-3 md:gap-6 text-sm font-medium text-black/60">
+            <button onClick={() => setActivePage('home')} className={cn("hover:text-black transition-colors", activePage === 'home' && "text-black")}>Home</button>
             <button 
               onClick={() => setShowHistory(true)}
               className="hover:text-black transition-colors flex items-center gap-2"
@@ -285,251 +285,322 @@ export default function App() {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-12 md:py-20">
-        {/* Hero Section */}
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-wider mb-6">
-            <Sparkles size={14} />
-            Professional Content Studio
-          </div>
-          <h1 className="text-5xl md:text-7xl font-serif font-medium leading-[1.1] mb-6 tracking-tight">
-            Craft high-ranking <br />
-            <span className="italic text-orange-500">stories</span> in seconds.
-          </h1>
-          <p className="text-lg text-black/60 max-w-2xl mx-auto leading-relaxed">
-            Generate SEO-optimized blog posts with custom tones, 
-            targeted keywords, and AI-generated hero imagery.
-          </p>
-        </div>
-
-        {/* Input Section */}
-        <div className="bg-white rounded-3xl border border-black/5 shadow-xl shadow-black/5 p-8 mb-12">
-          <div className="space-y-8">
-            {/* Topic Input */}
-            <div>
-              <label htmlFor="topic" className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
-                Main Topic
-              </label>
-              <div className="relative">
-                <input
-                  id="topic"
-                  type="text"
-                  placeholder="e.g. The Future of Sustainable Architecture in 2026"
-                  className="w-full bg-stone-50 border-none rounded-2xl px-6 py-5 text-lg focus:ring-2 focus:ring-orange-500/20 transition-all placeholder:text-black/20"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                />
-                <div className="absolute right-4 top-1/2 -translate-y-1/2 text-black/20">
-                  <Search size={20} />
-                </div>
+        {activePage === 'home' ? (
+          <>
+            {/* Hero Section */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold uppercase tracking-wider mb-6">
+                <Sparkles size={14} />
+                Professional Content Studio
               </div>
+              <h1 className="text-5xl md:text-7xl font-serif font-medium leading-[1.1] mb-6 tracking-tight">
+                Craft high-ranking <br />
+                <span className="italic text-orange-500">stories</span> in seconds.
+              </h1>
+              <p className="text-lg text-black/60 max-w-2xl mx-auto leading-relaxed">
+                Generate SEO-optimized blog posts with custom tones, 
+                targeted keywords, and AI-generated hero imagery.
+              </p>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Tone Selection */}
-              <div>
-                <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
-                  Writing Tone
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {tones.map((t) => (
-                    <button
-                      key={t}
-                      onClick={() => setTone(t)}
-                      className={cn(
-                        "px-4 py-2 rounded-full text-sm font-medium transition-all",
-                        tone === t 
-                          ? "bg-black text-white" 
-                          : "bg-stone-50 text-black/60 hover:bg-stone-100"
-                      )}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Length Selection */}
-              <div>
-                <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
-                  Article Length
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {lengths.map((l) => (
-                    <button
-                      key={l.label}
-                      onClick={() => setLength(l.label)}
-                      className={cn(
-                        "px-3 py-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1",
-                        length === l.label 
-                          ? "bg-orange-500 text-white" 
-                          : "bg-stone-50 text-black/60 hover:bg-stone-100"
-                      )}
-                    >
-                      <span>{l.label}</span>
-                      <span className={cn("text-[10px] opacity-60 font-medium", length === l.label ? "text-white" : "text-black/40")}>
-                        ~{l.words} words
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Keywords Input */}
-            <div>
-              <label htmlFor="keywords" className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
-                Target Keywords (Optional)
-              </label>
-              <input
-                id="keywords"
-                type="text"
-                placeholder="keyword1, keyword2..."
-                className="w-full bg-stone-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-orange-500/20 transition-all placeholder:text-black/20"
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
-              />
-            </div>
-
-            {/* Image Toggle */}
-            <div className="flex items-center justify-between p-4 bg-stone-50 rounded-2xl">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
-                  <Sparkles size={18} className="text-orange-500" />
-                </div>
+            {/* Input Section */}
+            <div className="bg-white rounded-3xl border border-black/5 shadow-xl shadow-black/5 p-8 mb-12">
+              <div className="space-y-8">
+                {/* Topic Input */}
                 <div>
-                  <p className="font-bold text-sm">Generate AI Hero Image</p>
-                  <p className="text-xs text-black/40">Creates a unique visual for your post</p>
+                  <label htmlFor="topic" className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
+                    Main Topic
+                  </label>
+                  <div className="relative">
+                    <input
+                      id="topic"
+                      type="text"
+                      placeholder="e.g. The Future of Sustainable Architecture in 2026"
+                      className="w-full bg-stone-50 border-none rounded-2xl px-6 py-5 text-lg focus:ring-2 focus:ring-orange-500/20 transition-all placeholder:text-black/20"
+                      value={topic}
+                      onChange={(e) => setTopic(e.target.value)}
+                    />
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-black/20">
+                      <Search size={20} />
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <button
-                onClick={() => setGenerateImage(!generateImage)}
-                className={cn(
-                  "w-12 h-6 rounded-full transition-all relative",
-                  generateImage ? "bg-orange-500" : "bg-stone-200"
-                )}
-              >
-                <div className={cn(
-                  "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
-                  generateImage ? "left-7" : "left-1"
-                )} />
-              </button>
-            </div>
 
-            <button
-              onClick={generateBlogPost}
-              disabled={isGenerating || !topic.trim()}
-              className={cn(
-                "w-full py-5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3",
-                isGenerating 
-                  ? "bg-stone-100 text-black/40 cursor-not-allowed" 
-                  : "bg-black text-white hover:bg-stone-800 active:scale-[0.98] shadow-lg shadow-black/10"
-              )}
-            >
-              {isGenerating ? (
-                <>
-                  <Loader2 className="animate-spin" size={20} />
-                  Architecting your post...
-                </>
-              ) : (
-                <>
-                  Generate Blog Post
-                  <ChevronRight size={20} />
-                </>
-              )}
-            </button>
-          </div>
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Tone Selection */}
+                  <div>
+                    <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
+                      Writing Tone
+                    </label>
+                    <div className="flex flex-wrap gap-2">
+                      {tones.map((t) => (
+                        <button
+                          key={t}
+                          onClick={() => setTone(t)}
+                          className={cn(
+                            "px-4 py-2 rounded-full text-sm font-medium transition-all",
+                            tone === t 
+                              ? "bg-black text-white" 
+                              : "bg-stone-50 text-black/60 hover:bg-stone-100"
+                          )}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
 
-          {error && (
-            <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-start gap-3">
-              <div className="mt-0.5">⚠️</div>
-              <p>{error}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Results Section */}
-        {isGenerating && (
-          <div className="space-y-8 animate-pulse">
-            <div className="h-12 bg-stone-100 rounded-xl w-3/4 mx-auto" />
-            <div className="h-64 bg-stone-100 rounded-3xl w-full" />
-            <div className="space-y-4">
-              <div className="h-4 bg-stone-100 rounded w-full" />
-              <div className="h-4 bg-stone-100 rounded w-full" />
-              <div className="h-4 bg-stone-100 rounded w-5/6" />
-            </div>
-          </div>
-        )}
-
-        {blogPost && (
-          <div ref={resultRef} className="animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center gap-3">
-                <h2 className="text-sm font-bold uppercase tracking-widest text-black/40">Generated Masterpiece</h2>
-                <div className="flex gap-2">
-                  <span className="px-2 py-0.5 rounded bg-stone-100 text-[10px] font-bold text-black/40 uppercase tracking-wider">
-                    {tone}
-                  </span>
-                  <span className="px-2 py-0.5 rounded bg-stone-100 text-[10px] font-bold text-black/40 uppercase tracking-wider">
-                    {length}
-                  </span>
+                  {/* Length Selection */}
+                  <div>
+                    <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
+                      Article Length
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {lengths.map((l) => (
+                        <button
+                          key={l.label}
+                          onClick={() => setLength(l.label)}
+                          className={cn(
+                            "px-3 py-2 rounded-xl text-xs font-bold transition-all flex flex-col items-center gap-1",
+                            length === l.label 
+                              ? "bg-orange-500 text-white" 
+                              : "bg-stone-50 text-black/60 hover:bg-stone-100"
+                          )}
+                        >
+                          <span>{l.label}</span>
+                          <span className={cn("text-[10px] opacity-60 font-medium", length === l.label ? "text-white" : "text-black/40")}>
+                            ~{l.words} words
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div className="flex items-center gap-2">
+
+                {/* Keywords Input */}
+                <div>
+                  <label htmlFor="keywords" className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-3">
+                    Target Keywords (Optional)
+                  </label>
+                  <input
+                    id="keywords"
+                    type="text"
+                    placeholder="keyword1, keyword2..."
+                    className="w-full bg-stone-50 border-none rounded-2xl px-6 py-4 text-sm focus:ring-2 focus:ring-orange-500/20 transition-all placeholder:text-black/20"
+                    value={keywords}
+                    onChange={(e) => setKeywords(e.target.value)}
+                  />
+                </div>
+
+                {/* Image Toggle */}
+                <div className="flex items-center justify-between p-4 bg-stone-50 rounded-2xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                      <Sparkles size={18} className="text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="font-bold text-sm">Generate AI Hero Image</p>
+                      <p className="text-xs text-black/40">Creates a unique visual for your post</p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setGenerateImage(!generateImage)}
+                    className={cn(
+                      "w-12 h-6 rounded-full transition-all relative",
+                      generateImage ? "bg-orange-500" : "bg-stone-200"
+                    )}
+                  >
+                    <div className={cn(
+                      "absolute top-1 w-4 h-4 bg-white rounded-full transition-all",
+                      generateImage ? "left-7" : "left-1"
+                    )} />
+                  </button>
+                </div>
+
                 <button
-                  onClick={exportAsHTML}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/5 hover:bg-stone-50 transition-colors text-sm font-medium"
+                  onClick={generateBlogPost}
+                  disabled={isGenerating || !topic.trim()}
+                  className={cn(
+                    "w-full py-5 rounded-2xl font-bold text-lg transition-all flex items-center justify-center gap-3",
+                    isGenerating 
+                      ? "bg-stone-100 text-black/40 cursor-not-allowed" 
+                      : "bg-black text-white hover:bg-stone-800 active:scale-[0.98] shadow-lg shadow-black/10"
+                  )}
                 >
-                  <FileText size={16} />
-                  Export HTML
-                </button>
-                <button
-                  onClick={copyToClipboard}
-                  className="flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white hover:bg-stone-800 transition-colors text-sm font-medium"
-                >
-                  {copied ? (
+                  {isGenerating ? (
                     <>
-                      <Check size={16} className="text-green-500" />
-                      Copied!
+                      <Loader2 className="animate-spin" size={20} />
+                      Architecting your post...
                     </>
                   ) : (
                     <>
-                      <Copy size={16} />
-                      Copy Markdown
+                      Generate Blog Post
+                      <ChevronRight size={20} />
                     </>
                   )}
                 </button>
               </div>
-            </div>
 
-            <article className="bg-white rounded-[2rem] border border-black/5 shadow-2xl shadow-black/5 overflow-hidden">
-              {heroImage && (
-                <div className="w-full aspect-video overflow-hidden border-b border-black/5">
-                  <img 
-                    src={heroImage} 
-                    alt="Hero" 
-                    className="w-full h-full object-cover"
-                    referrerPolicy="no-referrer"
-                  />
+              {error && (
+                <div className="mt-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-start gap-3">
+                  <div className="mt-0.5">⚠️</div>
+                  <p>{error}</p>
                 </div>
               )}
-              <div className="p-8 md:p-16 prose prose-stone prose-lg max-w-none prose-headings:font-serif prose-headings:font-medium prose-headings:tracking-tight prose-h1:text-4xl md:prose-h1:text-5xl prose-h2:text-3xl prose-h2:mt-12 prose-p:text-black/80 prose-p:leading-relaxed">
-                <Markdown>{blogPost}</Markdown>
-              </div>
-            </article>
-
-            <div className="mt-12 text-center">
-              <button
-                onClick={() => {
-                  setBlogPost(null);
-                  setHeroImage(null);
-                  setTopic('');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className="text-sm font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors"
-              >
-                Start a new project
-              </button>
             </div>
+
+            {/* About Section for SEO */}
+            <div className="mt-24 border-t border-black/5 pt-20">
+              <div className="max-w-3xl mx-auto text-center">
+                <h2 className="text-3xl font-serif font-medium mb-8">Why Gemini Blog Architect?</h2>
+                <div className="grid md:grid-cols-2 gap-12 text-left">
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg">Advanced AI Reasoning</h3>
+                    <p className="text-black/60 leading-relaxed">
+                      Leveraging Gemini 3.1 Pro, our tool doesn't just generate text; it understands context, 
+                      user intent, and SEO best practices to deliver content that resonates with both humans and search engines.
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="font-bold text-lg">SEO-First Approach</h3>
+                    <p className="text-black/60 leading-relaxed">
+                      Every post is architected with semantic HTML structure, natural keyword placement, 
+                      and comprehensive FAQ sections to maximize your chances of ranking on Google.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Results Section */}
+            {isGenerating && (
+              <div className="space-y-8 animate-pulse mt-20">
+                <div className="h-12 bg-stone-100 rounded-xl w-3/4 mx-auto" />
+                <div className="h-64 bg-stone-100 rounded-3xl w-full" />
+                <div className="space-y-4">
+                  <div className="h-4 bg-stone-100 rounded w-full" />
+                  <div className="h-4 bg-stone-100 rounded w-full" />
+                  <div className="h-4 bg-stone-100 rounded w-5/6" />
+                </div>
+              </div>
+            )}
+
+            {blogPost && (
+              <div ref={resultRef} className="animate-in fade-in slide-in-from-bottom-8 duration-700 mt-20">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-sm font-bold uppercase tracking-widest text-black/40">Generated Masterpiece</h2>
+                    <div className="flex gap-2">
+                      <span className="px-2 py-0.5 rounded bg-stone-100 text-[10px] font-bold text-black/40 uppercase tracking-wider">
+                        {tone}
+                      </span>
+                      <span className="px-2 py-0.5 rounded bg-stone-100 text-[10px] font-bold text-black/40 uppercase tracking-wider">
+                        {length}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={exportAsHTML}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-black/5 hover:bg-stone-50 transition-colors text-sm font-medium"
+                    >
+                      <FileText size={16} />
+                      Export HTML
+                    </button>
+                    <button
+                      onClick={copyToClipboard}
+                      className="flex items-center gap-2 px-4 py-2 rounded-full bg-black text-white hover:bg-stone-800 transition-colors text-sm font-medium"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={16} className="text-green-500" />
+                          Copied!
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={16} />
+                          Copy Markdown
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+
+                <article className="bg-white rounded-[2rem] border border-black/5 shadow-2xl shadow-black/5 overflow-hidden">
+                  {heroImage && (
+                    <div className="w-full aspect-video overflow-hidden border-b border-black/5">
+                      <img 
+                        src={heroImage} 
+                        alt="Hero" 
+                        className="w-full h-full object-cover"
+                        referrerPolicy="no-referrer"
+                      />
+                    </div>
+                  )}
+                  <div className="p-8 md:p-16 prose prose-stone prose-lg max-w-none prose-headings:font-serif prose-headings:font-medium prose-headings:tracking-tight prose-h1:text-4xl md:prose-h1:text-5xl prose-h2:text-3xl prose-h2:mt-12 prose-p:text-black/80 prose-p:leading-relaxed">
+                    <Markdown>{blogPost}</Markdown>
+                  </div>
+                </article>
+
+                <div className="mt-12 text-center">
+                  <button
+                    onClick={() => {
+                      setBlogPost(null);
+                      setHeroImage(null);
+                      setTopic('');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="text-sm font-bold uppercase tracking-widest text-black/40 hover:text-black transition-colors"
+                  >
+                    Start a new project
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        ) : activePage === 'privacy' ? (
+          <div className="bg-white rounded-[2rem] border border-black/5 p-8 md:p-16 prose prose-stone max-w-none">
+            <h1 className="font-serif">Privacy Policy</h1>
+            <p>Last updated: March 1, 2026</p>
+            <p>At Gemini Blog Architect, we respect your privacy. This policy outlines how we handle your data.</p>
+            <h2>Data Collection</h2>
+            <p>We do not store your personal information on our servers. All blog post history is stored locally in your browser's local storage.</p>
+            <h2>AI Processing</h2>
+            <p>The topics and keywords you provide are sent to Google's Gemini API for content generation. We do not use this data for any other purpose.</p>
+            <h2>Cookies</h2>
+            <p>We use local storage to save your preferences and history. We do not use tracking cookies.</p>
+            <button onClick={() => setActivePage('home')} className="mt-8 px-6 py-3 bg-black text-white rounded-xl font-bold">Back to Home</button>
+          </div>
+        ) : activePage === 'terms' ? (
+          <div className="bg-white rounded-[2rem] border border-black/5 p-8 md:p-16 prose prose-stone max-w-none">
+            <h1 className="font-serif">Terms of Service</h1>
+            <p>Last updated: March 1, 2026</p>
+            <p>By using Gemini Blog Architect, you agree to the following terms:</p>
+            <h2>Usage</h2>
+            <p>You are responsible for the content you generate. While our AI aims for high quality, you should always review and fact-check generated content before publishing.</p>
+            <h2>Intellectual Property</h2>
+            <p>You own the content you generate using our tool. We do not claim any ownership over your blog posts.</p>
+            <h2>Limitations</h2>
+            <p>Our tool is provided "as is" without warranties of any kind. We are not liable for any damages arising from the use of our service.</p>
+            <button onClick={() => setActivePage('home')} className="mt-8 px-6 py-3 bg-black text-white rounded-xl font-bold">Back to Home</button>
+          </div>
+        ) : (
+          <div className="bg-white rounded-[2rem] border border-black/5 p-8 md:p-16 prose prose-stone max-w-none">
+            <h1 className="font-serif">Contact Us</h1>
+            <p>Have questions or feedback? We'd love to hear from you.</p>
+            <div className="bg-stone-50 p-8 rounded-2xl not-prose">
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-2">Email</label>
+                  <p className="text-lg font-medium">support@blogarchitect.ai</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold uppercase tracking-widest text-black/40 mb-2">Twitter</label>
+                  <p className="text-lg font-medium">@BlogArchitectAI</p>
+                </div>
+              </div>
+            </div>
+            <button onClick={() => setActivePage('home')} className="mt-8 px-6 py-3 bg-black text-white rounded-xl font-bold">Back to Home</button>
           </div>
         )}
       </main>
@@ -539,9 +610,9 @@ export default function App() {
         <div className="max-w-5xl mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6 text-sm text-black/40">
           <p>© 2026 Gemini Blog Architect. All rights reserved.</p>
           <div className="flex items-center gap-8">
-            <a href="#" className="hover:text-black transition-colors">Privacy</a>
-            <a href="#" className="hover:text-black transition-colors">Terms</a>
-            <a href="#" className="hover:text-black transition-colors">Contact</a>
+            <button onClick={() => setActivePage('privacy')} className="hover:text-black transition-colors">Privacy</button>
+            <button onClick={() => setActivePage('terms')} className="hover:text-black transition-colors">Terms</button>
+            <button onClick={() => setActivePage('contact')} className="hover:text-black transition-colors">Contact</button>
           </div>
         </div>
       </footer>
