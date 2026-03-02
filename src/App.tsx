@@ -71,7 +71,7 @@ export default function App() {
       const ai = new GoogleGenAI({ apiKey });
       
       // 1. Generate Blog Post Text
-      const textModel = "gemini-3.1-pro-preview";
+      const textModel = "gemini-1.5-flash";
       const textPrompt = `
         Write a ${targetLength}-word original, SEO-optimized blog post on the topic: "${topic}".
         
