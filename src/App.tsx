@@ -4,7 +4,6 @@
  */
 
 import React, { useState, useRef } from 'react';
-import { GoogleGenAI } from "@google/genai";
 import Markdown from 'react-markdown';
 import { 
   PenTool, 
@@ -61,66 +60,29 @@ export default function App() {
     setBlogPost(null);
     setHeroImage(null);
 
-    const targetLength = lengths.find(l => l.label === length)?.words || 1200;
-
     try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      if (!apiKey) {
-        throw new Error("Gemini API Key is missing. Please ensure it is set in your environment secrets.");
-      }
-      const ai = new GoogleGenAI({ apiKey });
-      
-      // 1. Generate Blog Post Text
-      const textModel = "gemini-3.1-pro";
-      const textPrompt = `
-        Write a ${targetLength}-word original, SEO-optimized blog post on the topic: "${topic}".
-        
-        Requirements:
-        1. Tone: ${tone}. ${tone === 'Conversational' ? 'Use "I" and "you", be friendly.' : ''} ${tone === 'Technical' ? 'Focus on data, facts, and precise terminology.' : ''}
-        2. Keywords: Naturally incorporate these keywords: ${keywords || topic}.
-        3. Structure: Use clear headings (H1 for title, H2 and H3 for subheadings).
-        4. Content: Include real-world examples, statistics (if applicable), and actionable advice.
-        5. AdSense-friendly: Ensure the content is safe for all audiences and high quality.
-        6. Originality: Do not copy existing articles. Provide unique perspectives.
-        7. FAQ: Add a comprehensive FAQ section at the end with 5-7 common questions.
-        8. Length: Aim for approximately ${targetLength} words.
-        
-        Format the output in clean Markdown.
-      `;
-
-      const textResponse = await ai.models.generateContent({
-        model: textModel,
-        contents: textPrompt,
+      const response = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          topic,
+          tone,
+          length,
+          keywords,
+          generateImage
+        })
       });
 
-      const text = textResponse.text;
-      if (!text) throw new Error("No content generated. Please try again.");
-      setBlogPost(text);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to generate content.");
+      }
 
-      // 2. Generate Hero Image if requested
-      let generatedImg = null;
-      if (generateImage) {
-        try {
-          const imageResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash-image',
-            contents: {
-              parts: [{ text: `A high-quality, professional editorial hero image for a blog post about: ${topic}. Style: Modern, clean, and visually striking. No text in the image.` }],
-            },
-            config: {
-              imageConfig: { aspectRatio: "16:9" }
-            }
-          });
-
-          for (const part of imageResponse.candidates[0].content.parts) {
-            if (part.inlineData) {
-              generatedImg = `data:image/png;base64,${part.inlineData.data}`;
-              setHeroImage(generatedImg);
-              break;
-            }
-          }
-        } catch (imgErr) {
-          console.error("Image generation failed:", imgErr);
-        }
+      const { blogContent, heroImage: generatedImg } = await response.json();
+      
+      setBlogPost(blogContent);
+      if (generatedImg) {
+        setHeroImage(generatedImg);
       }
 
       // Save to history
@@ -129,7 +91,7 @@ export default function App() {
         topic,
         tone,
         length,
-        content: text,
+        content: blogContent,
         image: generatedImg,
         date: new Date().toLocaleDateString()
       };
